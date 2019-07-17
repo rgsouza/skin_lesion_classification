@@ -11,15 +11,14 @@ from PIL import ImageFilter
 from sklearn.model_selection import train_test_split
 
 
-df = pd.read_csv('metadata/HAM10000_metadata_MODIFIED2.csv')
+df = pd.read_csv('metadata/HAM10000_metadata.csv')
 all_image_path = glob(os.path.join('images/', '*', '*.jpg'))
-print(len(all_image_path))
 imageid_path_dict = {os.path.splitext(os.path.basename(x))[0]: x for x in all_image_path}
-df['path'] = df['new_image_id'].map(imageid_path_dict.get)
+df['path'] = df['image_id'].map(imageid_path_dict.get)
 df['categorical_label'] = pd.Categorical(df['dx']).codes
 
 # Creates new metadata 
-new_metadata = df[['new_image_id','categorical_label','path']].copy()
+new_metadata = df[['image_id','categorical_label','path']].copy()
 
 
 v = new_metadata.categorical_label.value_counts()
@@ -34,12 +33,12 @@ for i in range(7):
         print("Creating image for categorical_label", i)
         
         df_aux = df.loc[df['categorical_label']==i, :]
-        tdf = df_aux[['new_image_id','categorical_label','path']].copy()
+        tdf = df_aux[['image_id','categorical_label','path']].copy()
 
         
         for index, row in tdf.iterrows():
 
-            basename = row.new_image_id
+            basename = row.image_id
             
             im=Image.open(row.path)
             im=im.convert("RGB")
@@ -66,7 +65,7 @@ for i in range(7):
             b.save(b_path)
             im_blur.save(bl_path)
             
-            df1 = pd.DataFrame({"new_image_id":[r_name, g_name, b_name, bl_name], 
+            df1 = pd.DataFrame({"image_id":[r_name, g_name, b_name, bl_name], 
                          "categorical_label":[i, i, i, i],
                          'path': [r_path, g_path, b_path, bl_path]})
  
@@ -96,7 +95,7 @@ for i in range(7):
                 im_median.save(median_path)
     
             
-                df1 = pd.DataFrame({"new_image_id":[r_name, g_name, b_name, bl_name, un_name, rot_name,trans_name, max_name, median_name], 
+                df1 = pd.DataFrame({"image_id":[r_name, g_name, b_name, bl_name, un_name, rot_name,trans_name, max_name, median_name], 
                          "categorical_label":[i, i, i, i, i, i, i, i, i],
                          'path': [r_path, g_path, b_path, bl_path, un_path, rot_path,trans_path, max_path, median_path]}) 
                 
